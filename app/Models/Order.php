@@ -20,10 +20,10 @@ class Order extends Model
         return Order::with('status')->find($id);
     }
 
-    public static function newOrderAudit($order_id, $detail)
+    public static function newOrderAudit($order_number, $detail)
     {
         $order_audit = new OrderAudit();
-        $order_audit->order_id = $order_id;
+        $order_audit->order_number = $order_number;
         $order_audit->detail = $detail;
         $order_audit->save();
     }
