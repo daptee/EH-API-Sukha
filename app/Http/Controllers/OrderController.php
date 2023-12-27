@@ -39,17 +39,21 @@ class OrderController extends Controller
             $order->save();
 
             $this->model::newOrderAudit($request->order_number, [
-                "info" => "Creación de orden",
-                "data_sent" => $request->all()
+                "info" => "Creación de orden exitosa",
+                "data_sent" => $request->all(),
+                "error_message" => null, 
+                "error_line" => null,
             ]);
+
+            $this->model::newOrderStatusHistory(OrderStatus::PENDIENTE, $order->id);
             
         } catch (Exception $error) {
             Log::debug("Error al guardar orden: " . $error->getMessage() . ' line: ' . $error->getLine());
             $this->model::newOrderAudit($request->order_number, [
                 "info" => "Error al guardar orden",
+                "data_sent" => $request->all(),
                 "error_message" => $error->getMessage(), 
                 "error_line" => $error->getLine(),
-                "data_sent" => $request->all()
             ]);
             return response(["message" => "Error al guardar orden", "error" => $error->getMessage()], 500);
         }

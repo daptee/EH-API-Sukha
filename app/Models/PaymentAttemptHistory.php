@@ -10,7 +10,7 @@ class PaymentAttemptHistory extends Model
 {
     use HasFactory;
 
-    protected $table = "payment_attempt_history";
+    protected $table = "orders_payment_attempt_history";
 
     protected $casts = [
         "data" => 'json'
