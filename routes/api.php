@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FormController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -22,6 +23,9 @@ Route::post('payment', [PaymentController::class, 'store']);
 Route::post('product/images', [ProductController::class, 'store']);
 Route::get('product/images/{product_id}', [ProductController::class, 'product_images']);
 Route::get('product/images_principal', [ProductController::class, 'product_images_principal']);
+
+// Form contact
+Route::post('form/contact', [FormController::class, 'form_contact']);
 
 // Clear cache
 Route::get('/clear-cache', function() {
