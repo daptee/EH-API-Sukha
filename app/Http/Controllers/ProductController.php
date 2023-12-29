@@ -30,11 +30,12 @@ class ProductController extends Controller
 
         try {
             foreach ($request->images as $image) {
-                $response_save_image = $this->save_image_public_folder($image, "products/$request->product_code/images/");
+                $response_save_image = $this->save_image_public_folder($image['image'], "products/$request->product_code/images/");
                 if($response_save_image['status'] == 200){
                     $product_images = new $this->model();
                     $product_images->product_code = $request->product_code;
                     $product_images->url = $response_save_image['path'];
+                    $product_images->principal_image = $image['principal'];
                     $product_images->save();
                 }else{
                     Log::debug(["error" => "Error al guardar imagen", "message" => $response_save_image['message'], "product_code" => $request->product_code]);
@@ -58,5 +59,20 @@ class ProductController extends Controller
         } catch (Exception $error) {
             return ["status" => 500, "message" => $error->getMessage()];
         }
+    }
+
+    public function product_images($product_code)
+    {
+        $product_images = ProductImage::where('product_code', $product_code)->get();
+
+        return response()->json(['product_images' => $product_images], 200);
+    }
+
+    
+    public function product_images_principal()
+    {
+        $products_images = ProductImage::where('principal_image', 1)->get();
+
+        return response()->json(['products_images' => $products_images], 200);
     }
 }
