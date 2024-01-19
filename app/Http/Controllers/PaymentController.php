@@ -50,7 +50,7 @@ class PaymentController extends Controller
                 // Log::debug($client_email);
                 try {
                 //  ver informacion de data de compra
-                    Mail::to("slarramendy@daptee.com.ar")->send(new PaymentNotification($data_order, $order));                        
+                    Mail::to($client_email)->send(new PaymentNotification($data_order, $order));                        
                     // Mail::to("enzo100amarilla@gmail.com")->send(new PaymentNotification($data_order, $order));                        
                 } catch (Exception $error) {
                     Log::debug(print_r(["message" => $error->getMessage() . " error en envio de mail a $client_email en notificacion de orden confirmada", "order_number" => $order->order_number, $error->getLine()],  true));
