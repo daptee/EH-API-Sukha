@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -31,6 +32,9 @@ Route::post('form/contact', [FormController::class, 'form_contact']);
 // Categories images
 Route::post('category/image', [CategoryController::class, 'store']);
 Route::get('category/image/{cod_category}', [CategoryController::class, 'category_images']);
+
+// Newsletter
+Route::post('newsletter/register/email', [NewsletterController::class, 'newsletter_register_email']);
 
 // Clear cache
 Route::get('/clear-cache', function() {
