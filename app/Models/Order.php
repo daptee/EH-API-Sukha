@@ -51,4 +51,21 @@ class Order extends Model
                 "error_line" => $error->getLine(),
             ]);}
     }
+
+    public static function actionStatusOrder($status_id, $reason_rejection, $order_id)
+    {
+        switch ($status_id) {
+            case 2: // Pago rechazado
+                $rejected_payment = new RejectedPayment();
+                $rejected_payment->order_id = $order_id;
+                $rejected_payment->data = $reason_rejection;
+                $rejected_payment->save();
+                # code...
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+    }
 }

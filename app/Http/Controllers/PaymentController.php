@@ -43,6 +43,11 @@ class PaymentController extends Controller
             $payment_order_status_id = $data['payment_status'];
             $order->status_id = $payment_order_status_id;
             $order->save();
+
+            $payment_order_status_id = $data['payment_status'];
+            $rejection_reason = $data['rejection_reason'];
+            Order::actionStatusOrder($payment_order_status_id, $rejection_reason, $order->id);
+
             Order::newOrderStatusHistory($payment_order_status_id, $order->id);
 
             if($payment_order_status_id == OrderStatus::CONFIRMADO){
