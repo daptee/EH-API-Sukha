@@ -75,4 +75,16 @@ class ProductController extends Controller
 
         return response()->json(['products_images' => $products_images], 200);
     }
+
+    public function product_images_delete($image_id)
+    {
+        $product_image = $this->model::find($image_id);
+        
+        if(!$product_image)
+            return response()->json(['message' => 'ID image invalido.'], 400);
+        
+        $product_image->delete();
+    
+        return response()->json(['message' => 'Imagen eliminada con exito.'], 200);
+    }
 }

@@ -19,11 +19,18 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-// Order Controller
+// Order
 Route::post('order', [OrderController::class, 'store']);
+Route::post('order/change/status', [OrderController::class, 'order_change_status']);
+Route::get('order/{id}', [OrderController::class, 'show']);
+
+// Payment
 Route::post('payment', [PaymentController::class, 'store']);
+
+// Product
 Route::post('product/images', [ProductController::class, 'store']);
 Route::get('product/images/{product_id}', [ProductController::class, 'product_images']);
+Route::post('product/images/delete/{image_id}', [ProductController::class, 'product_images_delete']);
 Route::get('product/images_principal', [ProductController::class, 'product_images_principal']);
 
 // Form contact
@@ -32,6 +39,7 @@ Route::post('form/contact', [FormController::class, 'form_contact']);
 // Categories images
 Route::post('category/image', [CategoryController::class, 'store']);
 Route::get('category/image/{cod_category}', [CategoryController::class, 'category_images']);
+Route::post('category/images/delete/{image_id}', [CategoryController::class, 'delete_category_image']);
 
 // Newsletter
 Route::post('newsletter/register/email', [NewsletterController::class, 'newsletter_register_email']);
