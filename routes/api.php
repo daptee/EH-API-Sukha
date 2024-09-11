@@ -40,6 +40,7 @@ Route::post('form/contact', [FormController::class, 'form_contact']);
 
 // Categories images
 Route::post('category/image', [CategoryController::class, 'store']);
+Route::get('categories', [CategoryController::class, 'categories']);
 Route::get('category/image/{cod_category}', [CategoryController::class, 'category_images']);
 Route::post('category/images/delete/{image_id}', [CategoryController::class, 'delete_category_image']);
 
