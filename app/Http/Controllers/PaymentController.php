@@ -43,19 +43,24 @@ class PaymentController extends Controller
             $payment_order_status_id = $data['payment_status'];
             $order->status_id = $payment_order_status_id;
             $order->save();
+
+            $payment_order_status_id = $data['payment_status'];
+            $rejection_reason = $data['rejection_reason'] ?? null;
+            Order::actionStatusOrder($payment_order_status_id, $rejection_reason, $order->id);
+
             Order::newOrderStatusHistory($payment_order_status_id, $order->id);
 
-            if($payment_order_status_id == OrderStatus::CONFIRMADO){
-                $client_email = $data_order['email'];
-                // Log::debug($client_email);
-                try {
-                //  ver informacion de data de compra
-                    Mail::to($client_email)->send(new PaymentNotification($data_order, $order));                        
-                    // Mail::to("enzo100amarilla@gmail.com")->send(new PaymentNotification($data_order, $order));                        
-                } catch (Exception $error) {
-                    Log::debug(print_r(["message" => $error->getMessage() . " error en envio de mail a $client_email en notificacion de orden confirmada", "order_number" => $order->order_number, $error->getLine()],  true));
-                }
-            }
+            // if($payment_order_status_id == OrderStatus::CONFIRMADO){
+            //     $client_email = $data_order['email'];
+            //     // Log::debug($client_email);
+            //     try {
+            //     //  ver informacion de data de compra
+            //         Mail::to($client_email)->send(new PaymentNotification($data_order, $order));                        
+            //         // Mail::to("enzo100amarilla@gmail.com")->send(new PaymentNotification($data_order, $order));                        
+            //     } catch (Exception $error) {
+            //         Log::debug(print_r(["message" => $error->getMessage() . " error en envio de mail a $client_email en notificacion de orden confirmada", "order_number" => $order->order_number, $error->getLine()],  true));
+            //     }
+            // }
             
             Order::newOrderAudit($request->order_number, [
                 "info" => "Registro de pago exitoso",
