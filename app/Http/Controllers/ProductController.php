@@ -50,30 +50,62 @@ class ProductController extends Controller
             ],
             'images.*.principal' => 'required|boolean',
             'images.*.banner' => 'required|boolean',
+            'variations' => 'nullable|array',
+            'variations.*.id' => 'required_with:variations|integer',
+            'variations.*.images' => 'array',
         ], [
             'images.*.image.max' => "Cada imagen debe ser menor a 2 MB.",
+            'variations.*.image.max' => "Cada imagen debe ser menor a 2 MB.",
         ]);
 
         try {
-            foreach ($request->images as $image) {
-                $response_save_image = $this->save_image_public_folder($image['image'], "products/$request->product_code/images/");
-                if($response_save_image['status'] == 200){
-                    $product_images = new $this->model();
-                    $product_images->product_code = $request->product_code;
-                    $product_images->url = $response_save_image['path'];
-                    $product_images->principal_image = $image['principal'];
-                    $product_images->banner_image = $image['banner'];
-                    $product_images->save();
-                }else{
-                    Log::debug(["error" => "Error al guardar imagen", "message" => $response_save_image['message'], "product_code" => $request->product_code]);
+            // Guardar imágenes comunes del producto
+            $this->saveImages($request->product_code, $request->images);
+
+            // foreach ($request->images as $image) {
+            //     $response_save_image = $this->save_image_public_folder($image['image'], "products/$request->product_code/images/");
+            //     if($response_save_image['status'] == 200){
+            //         $product_images = new $this->model();
+            //         $product_images->product_code = $request->product_code;
+            //         $product_images->url = $response_save_image['path'];
+            //         $product_images->principal_image = $image['principal'];
+            //         $product_images->banner_image = $image['banner'];
+            //         $product_images->save();
+            //     }else{
+            //         Log::debug(["error" => "Error al guardar imagen", "message" => $response_save_image['message'], "product_code" => $request->product_code]);
+            //     }
+            // }
+
+            // Guardar imágenes de las variaciones, si existen
+            if ($request->has('variations')) {
+                foreach ($request->variations as $variation) {
+                    $this->saveImages("{$request->product_code}.{$variation['id']}", $variation['images']);
                 }
             }
+
         } catch (Exception $error) {
             Log::debug("Error al guardar imagenes: " . $error->getMessage() . ' line: ' . $error->getLine());
             return response(["message" => "Error al guardar imagenes", "error" => $error->getMessage()], 500);
         }
        
         return response()->json(['message' => 'Imagenes de producto guardadas exitosamentes.'], 200);
+    }
+    
+    private function saveImages($productCode, $images)
+    {
+        foreach ($images as $image) {
+            $response = $this->save_image_public_folder($image['image'], "products/$productCode/images/");
+            if ($response['status'] == 200) {
+                $productImage = new $this->model();
+                $productImage->product_code = $productCode;
+                $productImage->url = $response['path'];
+                $productImage->principal_image = $image['principal'] ?? null;
+                $productImage->banner_image = $image['banner'] ?? null;
+                $productImage->save();
+            } else {
+                Log::debug(["error" => "Error al guardar imagen", "message" => $response['message'], "product_code" => $productCode]);
+            }
+        }
     }
 
     public function save_image_public_folder($file, $path_to_save)
@@ -92,7 +124,14 @@ class ProductController extends Controller
     {
         $product_images = ProductImage::where('product_code', $product_code)->get();
 
-        return response()->json(['product_images' => $product_images], 200);
+        $variationImages = ProductImage::where('product_code', 'like', "$product_code.%")->get()
+        ->groupBy(function ($item) {
+            return explode('.', $item->product_code)[1]; // Extrae el ID de la variación
+        });
+
+        // $product_images['variations_images'] = ;
+
+        return response()->json(['product_images' => $product_images, 'variations_images' => $variationImages], 200);
     }
 
     
