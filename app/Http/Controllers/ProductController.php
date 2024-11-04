@@ -25,7 +25,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_code' => 'required',
-            'images' => 'required|array',
+            'images' => 'nullable|array',
             'images.*.image' => [
                 'required',
                 'file',
@@ -60,7 +60,9 @@ class ProductController extends Controller
 
         try {
             // Guardar imágenes comunes del producto
-            $this->saveImages($request->product_code, $request->images);
+            if($request->images){
+                $this->saveImages($request->product_code, $request->images);
+            }
 
             // foreach ($request->images as $image) {
             //     $response_save_image = $this->save_image_public_folder($image['image'], "products/$request->product_code/images/");
