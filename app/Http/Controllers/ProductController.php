@@ -122,19 +122,43 @@ class ProductController extends Controller
         }
     }
 
+    // public function product_images($product_code)
+    // {
+    //     $product_images = ProductImage::where('product_code', $product_code)->get();
+
+    //     $variationImages = ProductImage::where('product_code', 'like', "$product_code.%")->get()
+    //     ->groupBy(function ($item) {
+    //         return explode('.', $item->product_code)[1]; // Extrae el ID de la variación
+    //     });
+
+    //     // $product_images['variations_images'] = ;
+
+    //     return response()->json(['product_images' => $product_images, 'variations_images' => $variationImages], 200);
+    // }
+
     public function product_images($product_code)
     {
+        // Obtener las imágenes principales del producto
         $product_images = ProductImage::where('product_code', $product_code)->get();
 
+        // Obtener las imágenes de variaciones que tengan un código en el formato "444.X.Y"
         $variationImages = ProductImage::where('product_code', 'like', "$product_code.%")->get()
-        ->groupBy(function ($item) {
-            return explode('.', $item->product_code)[1]; // Extrae el ID de la variación
-        });
-
-        // $product_images['variations_images'] = ;
+            ->groupBy(function ($item) {
+                // Extraer la parte después de '444.', por ejemplo, "0.0" o "1.0"
+                return implode('.', array_slice(explode('.', $item->product_code), 1));
+            })
+            ->map(function ($images, $variation) {
+                // Formatear cada grupo en el formato solicitado
+                return [
+                    'variation' => $variation,
+                    'images' => $images->values()  // Asegurarse de que las imágenes están en un array numerado
+                ];
+            })
+            ->values(); // Convertir a un array numerado
 
         return response()->json(['product_images' => $product_images, 'variations_images' => $variationImages], 200);
     }
+
 
     
     public function product_images_principal()
