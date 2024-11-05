@@ -51,7 +51,7 @@ class ProductController extends Controller
             'images.*.principal' => 'required|boolean',
             'images.*.banner' => 'required|boolean',
             'variations' => 'nullable|array',
-            'variations.*.id' => 'required_with:variations|integer',
+            'variations.*.id' => 'required_with:variations',
             'variations.*.images' => 'array',
         ], [
             'images.*.image.max' => "Cada imagen debe ser menor a 2 MB.",
